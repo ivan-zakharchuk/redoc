@@ -61,11 +61,6 @@ const Content = styled.div`
   }
 `;
 
-export function buildThemeConfig(primaryColor: string): ThemeInterface
-{
-  return { colors: { primary: { main: primaryColor } } };
-}
-
 function ThemeSettings({ onChange, theme }: IThemeSettings)
 {
   const [showPicker, setShowPicker] = useState(false);
@@ -78,11 +73,18 @@ function ThemeSettings({ onChange, theme }: IThemeSettings)
         <Header>Settings</Header>
         <Content>
           <label>Primary Color:</label>
-          <input type="color" value={ theme.colors?.primary?.main as any } onChange={ e => onChangeDebounce(buildThemeConfig(e.target.value))}/>
+          <input type="color"
+                 value={ theme.colors?.primary?.main as string }
+                 onChange={ e => onChangeDebounce(buildThemeConfig(e.target.value))}/>
         </Content>
       </Container>
     </ThemeSettingsWrap>
   )
+}
+
+export function buildThemeConfig(primaryColor: string): ThemeInterface
+{
+  return { colors: { primary: { main: primaryColor } } };
 }
 
 export default ThemeSettings;
