@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { resolve as urlResolve } from 'url';
 import { RedocStandalone } from '../src';
 import ComboBox from './ComboBox';
+import ThemeSettings from './ThemeSettings';
+import { ThemeInterface } from '../src/theme';
 
 const DEFAULT_SPEC = 'openapi.yaml';
 const NEW_VERSION_SPEC = 'openapi-3-1.yaml';
@@ -22,7 +24,7 @@ const demos = [
 
 class DemoApp extends React.Component<
   {},
-  { specUrl: string; dropdownOpen: boolean; cors: boolean }
+  { specUrl: string; dropdownOpen: boolean; cors: boolean, theme: ThemeInterface }
 > {
   constructor(props) {
     super(props);
@@ -39,10 +41,13 @@ class DemoApp extends React.Component<
       cors = false;
     }
 
+    const theme = { colors: { primary: { main: "#000000" } } };
+
     this.state = {
       specUrl: url,
       dropdownOpen: false,
       cors,
+      theme,
     };
   }
 
@@ -60,6 +65,10 @@ class DemoApp extends React.Component<
     );
   };
 
+  onThemingChange = (colorHex: string) => {
+    this.setState({  theme: { colors: { primary: { main: colorHex } } } })
+  }
+
   toggleCors = (e: React.ChangeEvent<HTMLInputElement>) => {
     const cors = e.currentTarget.checked;
     this.setState({
@@ -73,7 +82,8 @@ class DemoApp extends React.Component<
   };
 
   render() {
-    const { specUrl, cors } = this.state;
+    const { specUrl, cors, theme } = this.state;
+    const mainColor = theme.colors?.primary?.main;
     let proxiedUrl = specUrl;
     if (specUrl !== DEFAULT_SPEC) {
       proxiedUrl = cors
@@ -100,6 +110,7 @@ class DemoApp extends React.Component<
               <input id="cors_checkbox" type="checkbox" onChange={this.toggleCors} checked={cors} />
               <label htmlFor="cors_checkbox">CORS</label>
             </CorsCheckbox>
+            <ThemeSettings onChange={ this.onThemingChange } value={ mainColor }/>
           </ControlsContainer>
           <iframe
             src="https://ghbtns.com/github-btn.html?user=Redocly&amp;repo=redoc&amp;type=star&amp;count=true&amp;size=large"
@@ -111,7 +122,7 @@ class DemoApp extends React.Component<
         </Heading>
         <RedocStandalone
           specUrl={proxiedUrl}
-          options={{ scrollYOffset: 'nav', untrustedSpec: true }}
+          options={{ scrollYOffset: 'nav', untrustedSpec: true, theme }}
         />
       </>
     );
