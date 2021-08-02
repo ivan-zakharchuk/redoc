@@ -6,6 +6,7 @@ import { RedocStandalone } from '../src';
 import ComboBox from './components/ComboBox';
 import ThemeSettings, { buildThemeConfig } from './components/ThemeSettings';
 import { ThemeInterface } from '../src/theme';
+import { updateQueryStringParameter } from './utils';
 
 const DEFAULT_SPEC = 'openapi.yaml';
 const NEW_VERSION_SPEC = 'openapi-3-1.yaml';
@@ -41,7 +42,7 @@ class DemoApp extends React.Component<
     };
   }
 
-  handleChange = (url: string) => {
+  onUrlChange = (url: string) => {
     if (url === NEW_VERSION_SPEC) {
       this.setState({ cors: false })
     }
@@ -62,9 +63,7 @@ class DemoApp extends React.Component<
   toggleCors = (e: React.ChangeEvent<HTMLInputElement>) => {
     const cors = e.currentTarget.checked;
 
-    this.setState({
-      cors,
-    });
+    this.setState({ cors });
 
     window.history.pushState(
       undefined,
@@ -93,7 +92,7 @@ class DemoApp extends React.Component<
             <ComboBox
               placeholder={'URL to a spec to try'}
               options={demos}
-              onChange={this.handleChange}
+              onChange={this.onUrlChange}
               value={ selectedSpecUrl }
             />
             <CorsCheckbox title="Use CORS proxy">
@@ -186,32 +185,3 @@ const Logo = styled.img`
 `;
 
 render(<DemoApp />, document.getElementById('container'));
-
-/* ====== Helpers ====== */
-function updateQueryStringParameter(uri, key, value) {
-  const keyValue = value === '' ? key : key + '=' + value;
-  const re = new RegExp('([?|&])' + key + '=?.*?(&|#|$)', 'i');
-  if (uri.match(re)) {
-    if (value !== undefined) {
-      return uri.replace(re, '$1' + keyValue + '$2');
-    } else {
-      return uri.replace(re, (_, separator: string, rest: string) => {
-        if (rest.startsWith('&')) {
-          rest = rest.substring(1);
-        }
-        return separator === '&' ? rest : separator + rest;
-      });
-    }
-  } else {
-    if (value === undefined) {
-      return uri;
-    }
-    let hash = '';
-    if (uri.indexOf('#') !== -1) {
-      hash = uri.replace(/.*#/, '#');
-      uri = uri.replace(/#.*/, '');
-    }
-    const separator = uri.indexOf('?') !== -1 ? '&' : '?';
-    return uri + separator + keyValue + hash;
-  }
-}

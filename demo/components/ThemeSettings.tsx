@@ -63,7 +63,7 @@ const Button = styled.button`
   border-radius: 50%;
   border-width: 0;
   color: white;
-  font-size: 20px;
+  font-size: 21px;
   line-height: 18px;
   padding: 0;
   margin: 0 10px;
