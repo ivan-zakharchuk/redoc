@@ -2,6 +2,12 @@ import * as React from 'react';
 import styled from '../src/styled-components';
 import { useState } from 'react';
 import { debounce } from './utils';
+import { ThemeInterface } from '../src/theme';
+
+interface IThemeSettings {
+  onChange(theme: ThemeInterface),
+  theme: ThemeInterface,
+}
 
 const Container = styled.div`
   position: absolute;
@@ -55,8 +61,12 @@ const Content = styled.div`
   }
 `;
 
+export function buildThemeConfig(primaryColor: string): ThemeInterface
+{
+  return { colors: { primary: { main: primaryColor } } };
+}
 
-function ThemeSettings({ onChange, value })
+function ThemeSettings({ onChange, theme }: IThemeSettings)
 {
   const [showPicker, setShowPicker] = useState(false);
   const onChangeDebounce = debounce(onChange, 250)
@@ -68,7 +78,7 @@ function ThemeSettings({ onChange, value })
         <Header>Settings</Header>
         <Content>
           <label>Primary Color:</label>
-          <input type="color" value={value} onChange={ ({target: { value }}) => onChangeDebounce(value)}/>
+          <input type="color" value={ theme.colors?.primary?.main as any } onChange={ e => onChangeDebounce(buildThemeConfig(e.target.value))}/>
         </Content>
       </Container>
     </ThemeSettingsWrap>

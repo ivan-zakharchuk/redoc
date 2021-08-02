@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { resolve as urlResolve } from 'url';
 import { RedocStandalone } from '../src';
 import ComboBox from './ComboBox';
-import ThemeSettings from './ThemeSettings';
+import ThemeSettings, { buildThemeConfig } from './ThemeSettings';
 import { ThemeInterface } from '../src/theme';
 
 const DEFAULT_SPEC = 'openapi.yaml';
@@ -41,7 +41,7 @@ class DemoApp extends React.Component<
       cors = false;
     }
 
-    const theme = { colors: { primary: { main: "#000000" } } };
+    const theme = buildThemeConfig("#000000");
 
     this.state = {
       specUrl: url,
@@ -65,9 +65,7 @@ class DemoApp extends React.Component<
     );
   };
 
-  onThemingChange = (colorHex: string) => {
-    this.setState({  theme: { colors: { primary: { main: colorHex } } } })
-  }
+  onThemingChange = (theme) => this.setState({ theme })
 
   toggleCors = (e: React.ChangeEvent<HTMLInputElement>) => {
     const cors = e.currentTarget.checked;
@@ -83,7 +81,6 @@ class DemoApp extends React.Component<
 
   render() {
     const { specUrl, cors, theme } = this.state;
-    const mainColor = theme.colors?.primary?.main;
     let proxiedUrl = specUrl;
     if (specUrl !== DEFAULT_SPEC) {
       proxiedUrl = cors
@@ -110,7 +107,7 @@ class DemoApp extends React.Component<
               <input id="cors_checkbox" type="checkbox" onChange={this.toggleCors} checked={cors} />
               <label htmlFor="cors_checkbox">CORS</label>
             </CorsCheckbox>
-            <ThemeSettings onChange={ this.onThemingChange } value={ mainColor }/>
+            <ThemeSettings onChange={ this.onThemingChange } theme={ theme }/>
           </ControlsContainer>
           <iframe
             src="https://ghbtns.com/github-btn.html?user=Redocly&amp;repo=redoc&amp;type=star&amp;count=true&amp;size=large"
