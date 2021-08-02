@@ -75,16 +75,10 @@ class DemoApp extends React.Component<
 
   render() {
     const { specUrl, cors, theme } = this.state;
-
-    let proxiedUrl = specUrl;
-
-    if (specUrl !== DEFAULT_SPEC) {
-      proxiedUrl = cors
-        ? '\\\\cors.redoc.ly/' + urlResolve(window.location.href, specUrl)
-        : specUrl;
-    }
-
     const selectedSpecUrl = specUrl === DEFAULT_SPEC ? '' : specUrl;
+    const proxiedUrl = cors && specUrl !== DEFAULT_SPEC
+      ? '\\\\cors.redoc.ly/' + urlResolve(window.location.href, specUrl)
+      : specUrl;
 
     return (
       <>
