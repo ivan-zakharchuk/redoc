@@ -1,12 +1,33 @@
 import * as React from 'react';
-import styled from '../src/styled-components';
+import styled from '../../src/styled-components';
 import { useState } from 'react';
-import { debounce } from './utils';
-import { ThemeInterface } from '../src/theme';
+import { debounce } from '../utils';
+import { ThemeInterface } from '../../src/theme';
 
 interface IThemeSettings {
   onChange(theme: ThemeInterface),
   theme: ThemeInterface,
+}
+
+function ThemeSettings({ onChange, theme }: IThemeSettings)
+{
+  const [showPicker, setShowPicker] = useState(false);
+  const onChangeDebounce = debounce(onChange, 250)
+
+  return (
+    <ThemeSettingsWrap>
+      <Button onClick={ () => setShowPicker(!showPicker) }>⚙</Button>
+      <Container active={ showPicker } >
+        <Header>Settings</Header>
+        <Content>
+          <label>Primary Color:</label>
+          <input type="color"
+                 value={ theme.colors?.primary?.main as string }
+                 onChange={ e => onChangeDebounce(buildThemeConfig(e.target.value))}/>
+        </Content>
+      </Container>
+    </ThemeSettingsWrap>
+  )
 }
 
 const Container = styled.div<{ active?: boolean }>`
@@ -58,27 +79,6 @@ const Content = styled.div`
     padding: 5px;
   }
 `;
-
-function ThemeSettings({ onChange, theme }: IThemeSettings)
-{
-  const [showPicker, setShowPicker] = useState(false);
-  const onChangeDebounce = debounce(onChange, 250)
-
-  return (
-    <ThemeSettingsWrap>
-      <Button onClick={ () => setShowPicker(!showPicker) }>⚙</Button>
-      <Container active={ showPicker } >
-        <Header>Settings</Header>
-        <Content>
-          <label>Primary Color:</label>
-          <input type="color"
-                 value={ theme.colors?.primary?.main as string }
-                 onChange={ e => onChangeDebounce(buildThemeConfig(e.target.value))}/>
-        </Content>
-      </Container>
-    </ThemeSettingsWrap>
-  )
-}
 
 export function buildThemeConfig(primaryColor: string): ThemeInterface
 {

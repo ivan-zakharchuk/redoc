@@ -4,7 +4,7 @@
  */
 
 import * as React from 'react';
-import styled from '../src/styled-components';
+import styled from '../../src/styled-components';
 
 const DropDownItem = styled.li<{ active?: boolean }>`
   ${(props: any) => (props.active ? 'background-color: #eee' : '')};

@@ -3,8 +3,8 @@ import { render } from 'react-dom';
 import styled from 'styled-components';
 import { resolve as urlResolve } from 'url';
 import { RedocStandalone } from '../src';
-import ComboBox from './ComboBox';
-import ThemeSettings, { buildThemeConfig } from './ThemeSettings';
+import ComboBox from './components/ComboBox';
+import ThemeSettings, { buildThemeConfig } from './components/ThemeSettings';
 import { ThemeInterface } from '../src/theme';
 
 const DEFAULT_SPEC = 'openapi.yaml';
@@ -29,18 +29,8 @@ class DemoApp extends React.Component<
   constructor(props) {
     super(props);
 
-    let parts = window.location.search.match(/url=([^&]+)/);
-    let url = DEFAULT_SPEC;
-    if (parts && parts.length > 1) {
-      url = decodeURIComponent(parts[1]);
-    }
-
-    parts = window.location.search.match(/[?&]nocors(&|#|$)/);
-    let cors = true;
-    if (parts && parts.length > 1) {
-      cors = false;
-    }
-
+    const url = getSpecUrl();
+    const cors = getCors();
     const theme = buildThemeConfig("#000000");
 
     this.state = {
@@ -55,9 +45,11 @@ class DemoApp extends React.Component<
     if (url === NEW_VERSION_SPEC) {
       this.setState({ cors: false })
     }
+
     this.setState({
       specUrl: url,
     });
+
     window.history.pushState(
       undefined,
       '',
@@ -69,9 +61,11 @@ class DemoApp extends React.Component<
 
   toggleCors = (e: React.ChangeEvent<HTMLInputElement>) => {
     const cors = e.currentTarget.checked;
+
     this.setState({
       cors,
     });
+
     window.history.pushState(
       undefined,
       '',
@@ -81,12 +75,17 @@ class DemoApp extends React.Component<
 
   render() {
     const { specUrl, cors, theme } = this.state;
+
     let proxiedUrl = specUrl;
+
     if (specUrl !== DEFAULT_SPEC) {
       proxiedUrl = cors
         ? '\\\\cors.redoc.ly/' + urlResolve(window.location.href, specUrl)
         : specUrl;
     }
+
+    const selectedSpecUrl = specUrl === DEFAULT_SPEC ? '' : specUrl;
+
     return (
       <>
         <Heading>
@@ -101,7 +100,7 @@ class DemoApp extends React.Component<
               placeholder={'URL to a spec to try'}
               options={demos}
               onChange={this.handleChange}
-              value={specUrl === DEFAULT_SPEC ? '' : specUrl}
+              value={ selectedSpecUrl }
             />
             <CorsCheckbox title="Use CORS proxy">
               <input id="cors_checkbox" type="checkbox" onChange={this.toggleCors} checked={cors} />
@@ -124,6 +123,22 @@ class DemoApp extends React.Component<
       </>
     );
   }
+}
+
+function getSpecUrl()
+{
+  const parts = window.location.search.match(/url=([^&]+)/);
+
+  return parts && parts.length > 1
+    ? decodeURIComponent(parts[1])
+    : DEFAULT_SPEC;
+}
+
+function getCors()
+{
+  const parts = window.location.search.match(/[?&]nocors(&|#|$)/);
+
+  return !(parts && parts.length > 1);
 }
 
 /* ====== Styled components ====== */
