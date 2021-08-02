@@ -9,7 +9,7 @@ interface IThemeSettings {
   theme: ThemeInterface,
 }
 
-const Container = styled.div`
+const Container = styled.div<{ active?: boolean }>`
   position: absolute;
   background-color: #f9f9f9;
   border: 1px solid gray;
@@ -20,9 +20,7 @@ const Container = styled.div`
   z-index: 1;
   display: none;
 
-  &.active {
-    display: block;
-  }
+  ${(props: any) => (props.active ? 'display: block' : '')};
 `;
 
 const ThemeSettingsWrap = styled.div`
@@ -69,7 +67,7 @@ function ThemeSettings({ onChange, theme }: IThemeSettings)
   return (
     <ThemeSettingsWrap>
       <Button onClick={ () => setShowPicker(!showPicker) }>⚙</Button>
-      <Container className={ showPicker ? "active" : '' } >
+      <Container active={ showPicker } >
         <Header>Settings</Header>
         <Content>
           <label>Primary Color:</label>
